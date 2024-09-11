@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
@@ -139,7 +140,7 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                         (int) (dividedWidth * 10),
                         (int) (dividedHeight * 23),
                         (int) (dividedWidth * 12),
-                        20,
+                        Button.DEFAULT_HEIGHT,
                         (s) -> updateSaveStatus(),
                         this,
                         nameInput));
@@ -158,7 +159,7 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                         (int) (dividedWidth * 11),
                         (int) (dividedHeight * 28),
                         (int) (dividedWidth * 3),
-                        20,
+                        Button.DEFAULT_HEIGHT,
                         s -> {
                             if (COORDINATE_PATTERN.matcher(s).matches()) {
                                 parsedXInput = Integer.parseInt(s);
@@ -179,7 +180,7 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                         (int) (dividedWidth * 15),
                         (int) (dividedHeight * 28),
                         (int) (dividedWidth * 3),
-                        20,
+                        Button.DEFAULT_HEIGHT,
                         s -> {
                             yInput.setRenderColor(
                                     COORDINATE_PATTERN.matcher(s).matches() ? CommonColors.GREEN : CommonColors.RED);
@@ -192,7 +193,7 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                         (int) (dividedWidth * 19),
                         (int) (dividedHeight * 28),
                         (int) (dividedWidth * 3),
-                        20,
+                        Button.DEFAULT_HEIGHT,
                         s -> {
                             if (COORDINATE_PATTERN.matcher(s).matches()) {
                                 parsedZInput = Integer.parseInt(s);
@@ -219,31 +220,47 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                 Optional<Integer> y = setupLocation.getY();
                 yInput.setTextBoxInput(y.isPresent() ? String.valueOf(y.get()) : "");
                 zInput.setTextBoxInput(String.valueOf(setupLocation.getZ()));
+            } else {
+                xInput.setTextBoxInput(Long.toString(Math.round(McUtils.player().getX())));
+                yInput.setTextBoxInput(Long.toString(Math.round(McUtils.player().getY())));
+                zInput.setTextBoxInput(Long.toString(Math.round(McUtils.player().getZ())));
             }
         }
+
+        this.addRenderableWidget(new Button.Builder(
+                Component.translatable("screens.wynntils.poiCreation.here"),
+                (button) -> {
+                    xInput.setTextBoxInput(Long.toString(Math.round(McUtils.player().getX())));
+                    yInput.setTextBoxInput(Long.toString(Math.round(McUtils.player().getY())));
+                    zInput.setTextBoxInput(Long.toString(Math.round(McUtils.player().getZ())));
+                })
+                .tooltip(Tooltip.create(Component.translatable("screens.wynntils.poiCreation.here.tooltip")))
+                .pos((int) (dividedWidth * 22.5), (int) (dividedHeight * 28))
+                .size(Button.DEFAULT_HEIGHT * 2, Button.DEFAULT_HEIGHT)
+                .build());
 
         // endregion
 
         // region Icon
         this.addRenderableWidget(new Button.Builder(Component.literal("<"), (button) -> {
-                    if (selectedIconIndex - 1 < 0) {
-                        selectedIconIndex = Services.Poi.POI_ICONS.size() - 1;
-                    } else {
-                        selectedIconIndex--;
-                    }
-                })
+            if (selectedIconIndex - 1 < 0) {
+                selectedIconIndex = Services.Poi.POI_ICONS.size() - 1;
+            } else {
+                selectedIconIndex--;
+            }
+        })
                 .pos((int) (dividedWidth * 10), (int) (dividedHeight * 34))
-                .size(20, 20)
+                .size(Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT)
                 .build());
         this.addRenderableWidget(new Button.Builder(Component.literal(">"), (button) -> {
-                    if (selectedIconIndex + 1 >= Services.Poi.POI_ICONS.size()) {
-                        selectedIconIndex = 0;
-                    } else {
-                        selectedIconIndex++;
-                    }
-                })
+            if (selectedIconIndex + 1 >= Services.Poi.POI_ICONS.size()) {
+                selectedIconIndex = 0;
+            } else {
+                selectedIconIndex++;
+            }
+        })
                 .pos((int) (dividedWidth * 14), (int) (dividedHeight * 34))
-                .size(20, 20)
+                .size(Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT)
                 .build());
         if (oldPoi != null && firstSetup) {
             int index = Services.Poi.POI_ICONS.indexOf(oldPoi.getIcon());
@@ -257,7 +274,7 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                         (int) (dividedWidth * 16.5),
                         (int) (dividedHeight * 34),
                         (int) (dividedWidth * 5.5),
-                        20,
+                        Button.DEFAULT_HEIGHT,
                         (s) -> {
                             CustomColor color = CustomColor.fromHexString(s);
 
@@ -280,25 +297,25 @@ public final class PoiCreationScreen extends AbstractMapScreen {
             colorInput.setTextBoxInput("#FFFFFF");
         }
         this.addRenderableWidget(
-                new ColorPickerWidget((int) (dividedWidth * 22.5), (int) (dividedHeight * 34), 20, 20, colorInput));
+                new ColorPickerWidget((int) (dividedWidth * 22.5), (int) (dividedHeight * 34), Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT, colorInput));
         // endregion
 
         // region Visibility
         this.addRenderableWidget(new Button.Builder(
-                        Component.literal("<"),
-                        (button) -> selectedVisiblity = CustomPoi.Visibility.values()[
-                                (selectedVisiblity.ordinal() - 1 + CustomPoi.Visibility.values().length)
-                                        % CustomPoi.Visibility.values().length])
+                Component.literal("<"),
+                (button) -> selectedVisiblity = CustomPoi.Visibility.values()[
+                        (selectedVisiblity.ordinal() - 1 + CustomPoi.Visibility.values().length)
+                                % CustomPoi.Visibility.values().length])
                 .pos((int) (dividedWidth * 10), (int) (dividedHeight * 40))
-                .size(20, 20)
+                .size(Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT)
                 .build());
         this.addRenderableWidget(new Button.Builder(
-                        Component.literal(">"),
-                        (button) -> selectedVisiblity = CustomPoi.Visibility.values()[
-                                (selectedVisiblity.ordinal() + 1 + CustomPoi.Visibility.values().length)
-                                        % CustomPoi.Visibility.values().length])
+                Component.literal(">"),
+                (button) -> selectedVisiblity = CustomPoi.Visibility.values()[
+                        (selectedVisiblity.ordinal() + 1 + CustomPoi.Visibility.values().length)
+                                % CustomPoi.Visibility.values().length])
                 .pos((int) (dividedWidth * 22) - 19, (int) (dividedHeight * 40))
-                .size(20, 20)
+                .size(Button.DEFAULT_HEIGHT, Button.DEFAULT_HEIGHT)
                 .build());
 
         if (oldPoi != null && firstSetup) {
@@ -308,19 +325,21 @@ public final class PoiCreationScreen extends AbstractMapScreen {
 
         // region Screen Interactions
         this.addRenderableWidget(new Button.Builder(
-                        Component.translatable("screens.wynntils.poiCreation.cancel"), (button) -> this.onClose())
+                Component.translatable("screens.wynntils.poiCreation.cancel"),
+                (button) -> this.onClose())
                 .pos((int) (dividedWidth * 6), (int) (dividedHeight * 54))
-                .size((int) (dividedWidth * 8), 20)
+                .size((int) (dividedWidth * 8), Button.DEFAULT_HEIGHT)
                 .build());
 
         this.addRenderableWidget(
                 saveButton = new Button.Builder(
-                                Component.translatable("screens.wynntils.poiCreation.save"), (button) -> {
-                                    savePoi();
-                                    this.onClose();
-                                })
+                        Component.translatable("screens.wynntils.poiCreation.save"),
+                        (button) -> {
+                            savePoi();
+                            this.onClose();
+                        })
                         .pos((int) (dividedWidth * 18), (int) (dividedHeight * 54))
-                        .size((int) (dividedWidth * 8), 20)
+                        .size((int) (dividedWidth * 8), Button.DEFAULT_HEIGHT)
                         .build());
         // endregion
 
@@ -572,7 +591,7 @@ public final class PoiCreationScreen extends AbstractMapScreen {
                 && CustomColor.fromHexString(colorInput.getTextBoxInput()) != CustomColor.NONE
                 && COORDINATE_PATTERN.matcher(xInput.getTextBoxInput()).matches()
                 && (COORDINATE_PATTERN.matcher(yInput.getTextBoxInput()).matches()
-                        || yInput.getTextBoxInput().isEmpty())
+                || yInput.getTextBoxInput().isEmpty())
                 && COORDINATE_PATTERN.matcher(zInput.getTextBoxInput()).matches();
     }
 

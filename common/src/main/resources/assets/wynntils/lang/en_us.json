@@ -2342,6 +2342,8 @@
   "screens.wynntils.poiCreation.cancel": "Cancel",
   "screens.wynntils.poiCreation.color": "Color",
   "screens.wynntils.poiCreation.coordinates": "Coordinates",
+  "screens.wynntils.poiCreation.here": "Here",
+  "screens.wynntils.poiCreation.here.tooltip": "Set POI location to your current location",
   "screens.wynntils.poiCreation.icon": "Icon",
   "screens.wynntils.poiCreation.save": "Save",
   "screens.wynntils.poiCreation.visibility": "Visibility",
